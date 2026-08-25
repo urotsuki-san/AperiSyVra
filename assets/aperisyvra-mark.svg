@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">AperiSyVra mark</title>
+  <desc id="desc">Fivefold aperiodic rhomb mark with an orchard ray</desc>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="0.52" stop-color="#8b5cf6"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="48" fill="#090b18"/>
+  <g transform="translate(128 128)" fill="none" stroke="url(#g)" stroke-width="8" stroke-linejoin="round">
+    <path d="M0-94 36-30 0 34-36-30Z"/>
+    <path d="M89-29 30-9 0 34 59 14Z"/>
+    <path d="M55 76 18 27 0 34 37 83Z"/>
+    <path d="M-55 76-18 27 0 34-37 83Z"/>
+    <path d="M-89-29-30-9 0 34-59 14Z"/>
+  </g>
+  <path d="M31 220 128 128 225 56" fill="none" stroke="#f8fafc" stroke-opacity=".72" stroke-width="3" stroke-dasharray="4 10"/>
+  <circle cx="128" cy="128" r="9" fill="#f8fafc"/>
+</svg>

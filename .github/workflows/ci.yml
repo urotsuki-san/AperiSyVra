@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Rust 1.81
+        run: |
+          rustup toolchain install 1.81.0 --profile minimal --component rustfmt --component clippy
+          rustup default 1.81.0
+      - name: Verify dependency lock
+        run: cargo metadata --locked --no-deps --format-version 1 > /dev/null
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Run Clippy
+        run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+      - name: Run tests
+        run: cargo test --locked --workspace --all-features
+      - name: Exercise key generation and message sealing
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$(mktemp -d)"
+          printf 'AperiSyVra P1 end-to-end test\n' > "$work/plain.txt"
+          cargo run --locked --release -p aperisyvra -- keygen \
+            --public "$work/alice.avpk" \
+            --secret "$work/alice.avsk"
+          cargo run --locked --release -p aperisyvra -- seal \
+            --public "$work/alice.avpk" \
+            --input "$work/plain.txt" \
+            --output "$work/message.avm"
+          cargo run --locked --release -p aperisyvra -- open \
+            --secret "$work/alice.avsk" \
+            --input "$work/message.avm" \
+            --output "$work/opened.txt"
+          cmp "$work/plain.txt" "$work/opened.txt"
+          cargo run --locked --release -p aperisyvra-analysis -- matrix-report \
+            --secret "$work/alice.avsk"
+      - name: Scan the decoder across deterministic keys
+        shell: bash
+        run: |
+          set -euo pipefail
+          failed=0
+          for seed in $(seq 1 16); do
+            output="$(cargo run --locked --release -p aperisyvra-analysis -- decoder-scan \
+              --trials 1000 \
+              --seed "$seed")"
+            printf '%s\n' "$output"
+            if ! grep -q '^failures: 0$' <<< "$output"; then
+              failed=1
+            fi
+          done
+          test "$failed" -eq 0
+
+  cross-platform:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Rust 1.81
+        shell: bash
+        run: |
+          rustup toolchain install 1.81.0 --profile minimal
+          rustup default 1.81.0
+      - run: cargo build --locked --release --workspace --all-features
+      - run: cargo test --locked --workspace --all-features

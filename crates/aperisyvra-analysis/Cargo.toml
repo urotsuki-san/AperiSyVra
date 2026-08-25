@@ -1,0 +1,14 @@
+[package]
+name = "aperisyvra-analysis"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Analysis tools for the AperiSyVra P1 profile"
+
+[dependencies]
+anyhow.workspace = true
+aperisyvra-core = { path = "../aperisyvra-core", features = ["research-tools"] }
+clap.workspace = true

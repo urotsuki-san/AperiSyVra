@@ -1,0 +1,12 @@
+/target/
+*.avpk
+*.avsk
+*.avct
+*.avm
+*.shared
+sender.shared
+receiver.shared
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
